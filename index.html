@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Тест уровней слушания: поверхностное / фокусное / эмпатическое</title>
+<style>
+  :root{
+    --bg:#0e0f12;
+    --card:#151821;
+    --muted:#8b93a7;
+    --text:#e8ebf3;
+    --accent:#7aa2ff;
+    --good:#7ee787;
+    --warn:#f2cc60;
+    --bad:#ff7b72;
+    --bar:#2a3142;
+    --bar2:#2d364a;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:24px;
+    background:linear-gradient(180deg,#0b0c0f 0%, #11131b 100%);
+    color:var(--text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
+  }
+  h1{font-size:28px; margin:0 0 8px}
+  .sub{color:var(--muted); margin-bottom:24px}
+  .container{max-width:980px; margin:0 auto}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:var(--radius);
+    padding:20px; margin:16px 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .grid{
+    display:grid; gap:16px;
+    grid-template-columns: repeat(1, 1fr);
+  }
+  @media (min-width: 900px){
+    .grid{grid-template-columns: 1fr 1fr;}
+  }
+  h2{font-size:18px; margin:0 0 10px}
+  .item{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05)}
+  .item label{flex:1; line-height:1.35}
+  .scale{display:flex; gap:8px; align-items:center}
+  .radio{display:flex; gap:6px}
+  .radio input{display:none}
+  .radio label{
+    width:34px; height:34px; display:grid; place-items:center;
+    border-radius:10px; cursor:pointer;
+    border:1px solid rgba(255,255,255,0.1);
+    background:linear-gradient(180deg, #1a2030, #151b28);
+    color:var(--muted); font-size:13px; user-select:none;
+    transition:all .18s ease;
+  }
+  .radio input:checked + label{
+    background:linear-gradient(180deg,#223560,#1b2746);
+    border-color:var(--accent); color:var(--text);
+    box-shadow:0 4px 14px rgba(122,162,255,0.25);
+  }
+  .legend{display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-top:6px}
+  .actions{display:flex; gap:10px; flex-wrap:wrap}
+  button{
+    background:linear-gradient(180deg,#2b61ff,#274fe6);
+    border:none; color:white; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:600;
+    box-shadow:0 10px 30px rgba(39,79,230,0.35);
+    transition: transform .08s ease;
+  }
+  button.secondary{
+    background:linear-gradient(180deg,#30374a,#242b3b);
+    box-shadow:none; color:#cbd5e1; border:1px solid rgba(255,255,255,0.08);
+  }
+  button:active{transform:translateY(1px)}
+  .results{display:grid; gap:16px}
+  .bar{
+    background:var(--bar); border-radius:12px; height:14px; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.06);
+  }
+  .bar > span{
+    position:absolute; top:0; left:0; height:100%; width:0%;
+    background:linear-gradient(90deg, rgba(122,162,255,0.2), rgba(122,162,255,0.7));
+    transition:width .6s ease;
+  }
+  .row{display:grid; grid-template-columns:160px 1fr 80px; align-items:center; gap:12px}
+  .tag{font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); color:#cbd5e1; text-align:center}
+  .tag.good{border-color:rgba(126,231,135,0.5); color:var(--good)}
+  .tag.warn{border-color:rgba(242,204,96,0.5); color:var(--warn)}
+  .tag.bad{border-color:rgba(255,123,114,0.5); color:var(--bad)}
+  .kpis{display:grid; gap:8px; grid-template-columns: repeat(1, 1fr)}
+  @media(min-width:750px){ .kpis{grid-template-columns: repeat(3, 1fr)} }
+  .kpis .card{padding:14px}
+  .small{font-size:12px; color:var(--muted)}
+  .footer{margin-top:16px; color:var(--muted); font-size:12px; text-align:center}
+  .title-mini{color:#a5b0c6; font-weight:600; text-transform:uppercase; letter-spacing:.08em; font-size:12px; margin-bottom:6px}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Тест уровней слушания</h1>
+    <div class="sub">Оцените утверждения по шкале 1–5: 1 — никогда · 5 — всегда. Три шкалы: <b>Поверхностное</b>, <b>Фокусное</b>, <b>Эмпатическое</b>.</div>
+
+    <div class="grid">
+      <!-- Поверхностное слушание -->
+      <div class="card">
+        <div class="title-mini">Уровень A — Поверхностное слушание</div>
+        <h2>Как часто это про вас?</h2>
+        <div class="legend"><span>1 — никогда</span><span>5 — всегда</span></div>
+
+        <div class="item">
+          <label>Думаю о своих задачах, пока человек говорит.</label>
+          <div class="radio" data-key="A1"></div>
+        </div>
+        <div class="item">
+          <label>Перебиваю и предлагаю решение до конца истории.</label>
+          <div class="radio" data-key="A2"></div>
+        </div>
+        <div class="item">
+          <label>Отвлекаюсь на уведомления или посторонние мысли.</label>
+          <div class="radio" data-key="A3"></div>
+        </div>
+        <div class="item">
+          <label>Жду своей очереди говорить вместо уточнений.</label>
+          <div class="radio" data-key="A4"></div>
+        </div>
+        <div class="item">
+          <label>Делаю выводы, не проверив, правильно ли понял.</label>
+          <div class="radio" data-key="A5"></div>
+        </div>
+        <div class="item">
+          <label>Редко фиксирую итог разговора и следующий шаг.</label>
+          <div class="radio" data-key="A6"></div>
+        </div>
+      </div>
+
+      <!-- Фокусное слушание -->
+      <div class="card">
+        <div class="title-mini">Уровень B — Фокусное слушание</div>
+        <h2>Как часто это про вас?</h2>
+        <div class="legend"><span>1 — никогда</span><span>5 — всегда</span></div>
+
+        <div class="item">
+          <label>Перефразирую ключевую мысль собеседника перед ответом.</label>
+          <div class="radio" data-key="B1"></div>
+        </div>
+        <div class="item">
+          <label>Задаю уточняющие вопросы, чтобы прояснить детали.</label>
+          <div class="radio" data-key="B2"></div>
+        </div>
+        <div class="item">
+          <label>Отмечаю факты, сроки, имена, иногда записываю.</label>
+          <div class="radio" data-key="B3"></div>
+        </div>
+        <div class="item">
+          <label>Договариваюсь о следующем шаге и владельце.</label>
+          <div class="radio" data-key="B4"></div>
+        </div>
+        <div class="item">
+          <label>Поддерживаю зрительный контакт и невербальные сигналы.</label>
+          <div class="radio" data-key="B5"></div>
+        </div>
+        <div class="item">
+          <label>Резюмирую в конце: что решили и к какому сроку.</label>
+          <div class="radio" data-key="B6"></div>
+        </div>
+      </div>
+
+      <!-- Эмпатическое слушание -->
+      <div class="card">
+        <div class="title-mini">Уровень C — Эмпатическое слушание</div>
+        <h2>Как часто это про вас?</h2>
+        <div class="legend"><span>1 — никогда</span><span>5 — всегда</span></div>
+
+        <div class="item">
+          <label>Замечаю эмоции собеседника и мягко их называю.</label>
+          <div class="radio" data-key="C1"></div>
+        </div>
+        <div class="item">
+          <label>Приостанавливаю «советы», сначала признаю переживания.</label>
+          <div class="radio" data-key="C2"></div>
+        </div>
+        <div class="item">
+          <label>Спрашиваю, что важно человеку в этой ситуации.</label>
+          <div class="radio" data-key="C3"></div>
+        </div>
+        <div class="item">
+          <label>Отражаю чувства нейтрально: «слышу, что…».</label>
+          <div class="radio" data-key="C4"></div>
+        </div>
+        <div class="item">
+          <label>Следую темпу и паузам, не тороплю речь.</label>
+          <div class="radio" data-key="C5"></div>
+        </div>
+        <div class="item">
+          <label>Уточняю ожидания: какую помощь человек ждёт сейчас.</label>
+          <div class="radio" data-key="C6"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="actions">
+        <button id="calc">Подсчитать результат</button>
+        <button class="secondary" id="reset">Сбросить</button>
+        <button class="secondary" id="copy">Скопировать результаты</button>
+      </div>
+      <div class="results" id="results" style="margin-top:16px; display:none;">
+        <h2>Результаты</h2>
+        <div class="row">
+          <div>Поверхностное (A)</div>
+          <div class="bar"><span id="barA"></span></div>
+          <div id="tagA" class="tag">—</div>
+        </div>
+        <div class="row">
+          <div>Фокусное (B)</div>
+          <div class="bar"><span id="barB"></span></div>
+          <div id="tagB" class="tag">—</div>
+        </div>
+        <div class="row">
+          <div>Эмпатическое (C)</div>
+          <div class="bar"><span id="barC"></span></div>
+          <div id="tagC" class="tag">—</div>
+        </div>
+
+        <div class="grid" style="margin-top:10px;">
+          <div class="card">
+            <div class="title-mini">Интерпретация</div>
+            <div id="interpretation" class="small"></div>
+          </div>
+          <div class="card">
+            <div class="title-mini">Быстрые шаги развития</div>
+            <ul id="tips" class="small" style="margin:0 0 0 16px;"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer">Шкала: на каждую из трёх шкал — 6 утверждений × 1–5 баллов → диапазон 6–30. Цель — <b>меньше A</b>, <b>больше B и C</b>.</div>
+    </div>
+  </div>
+
+<script>
+  // build radio groups 1..5 for each item
+  function buildRadios(){
+    document.querySelectorAll(".radio").forEach((wrap)=>{
+      const key = wrap.getAttribute("data-key");
+      wrap.innerHTML = "";
+      for (let i=1;i<=5;i++){
+        const id = key+"_"+i;
+        const input = document.createElement("input");
+        input.type="radio"; input.name=key; input.id=id; input.value=String(i);
+        const label = document.createElement("label");
+        label.htmlFor=id; label.textContent=String(i);
+        wrap.appendChild(input); wrap.appendChild(label);
+      }
+    });
+  }
+  buildRadios();
+
+  function sum(prefix){
+    let s = 0;
+    for(let i=1;i<=6;i++){
+      const sel = document.querySelector(`input[name='${prefix}${i}']:checked`);
+      s += sel ? Number(sel.value) : 0;
+    }
+    return s;
+  }
+
+  function tagFor(score, positive=true){
+    // 6–30. For A (surface), "positive"=false (low is good).
+    if(positive){
+      if(score>=24) return {text:"высокий", cls:"good"};
+      if(score>=16) return {text:"средний", cls:"warn"};
+      return {text:"низкий", cls:"bad"};
+    } else {
+      if(score<=12) return {text:"низкий", cls:"good"};
+      if(score<=20) return {text:"средний", cls:"warn"};
+      return {text:"высокий", cls:"bad"};
+    }
+  }
+
+  function percent(score){ return Math.max(0, Math.min(100, Math.round((score/30)*100))); }
+
+  function calc(){
+    const A = sum("A"), B = sum("B"), C = sum("C");
+    const res = document.getElementById("results");
+    res.style.display = "block";
+
+    // bars
+    document.getElementById("barA").style.width = percent(A)+"%";
+    document.getElementById("barB").style.width = percent(B)+"%";
+    document.getElementById("barC").style.width = percent(C)+"%";
+
+    // tags
+    const tA = tagFor(A, false), tB = tagFor(B, true), tC = tagFor(C, true);
+    ["A","B","C"].forEach((k)=>{
+      const tag = document.getElementById("tag"+k);
+      const obj = (k==="A") ? tA : (k==="B" ? tB : tC);
+      tag.textContent = obj.text;
+      tag.className = "tag " + obj.cls;
+    });
+
+    // interpretation
+    const interp = [];
+    interp.push(`A (поверхностное): ${A} / 30 — ${tA.text}.`);
+    interp.push(`B (фокусное): ${B} / 30 — ${tB.text}.`);
+    interp.push(`C (эмпатическое): ${C} / 30 — ${tC.text}.`);
+    const domI = document.getElementById("interpretation");
+    domI.innerHTML = interp.join("<br>");
+
+    // tips
+    const tips = document.getElementById("tips");
+    tips.innerHTML = "";
+    // choose suggestions based on weakest area (consider A high as weakness)
+    const weaknesses = [];
+    // for A, high is weakness; for B/C, low is weakness
+    weaknesses.push({k:"A", score:30-A}); // invert so higher = better
+    weaknesses.push({k:"B", score:B});
+    weaknesses.push({k:"C", score:C});
+    weaknesses.sort((x,y)=> x.score - y.score); // weakest first
+
+    const add = (txt)=>{ const li=document.createElement("li"); li.textContent=txt; tips.appendChild(li); };
+
+    const w = weaknesses[0].k;
+    if(w==="A"){
+      add("Отключайте уведомления и фиксируйте цель разговора.");
+      add("Прежде чем ответить — перефразируйте ключевую мысль.");
+      add("В конце договоритесь: следующий шаг, срок, владелец.");
+    } else if(w==="B"){
+      add("Задавайте 2 уточняющих вопроса перед предложением решений.");
+      add("Ведите краткое резюме: итоги, сроки, ответственные.");
+      add("Сверяйте понимание: «правильно ли я понял, что…»");
+    } else if(w==="C"){
+      add("Назовите эмоцию нейтрально: «слышу, что вы расстроены…»");
+      add("Пауза перед советом: сначала признание переживаний.");
+      add("Спросите, что важно человеку и какой помощи ждёт.");
+    }
+  }
+
+  function resetAll(){
+    document.querySelectorAll("input[type=radio]").forEach(i=> i.checked=false);
+    document.getElementById("results").style.display="none";
+  }
+
+  function copyResults(){
+    const res = document.getElementById("results");
+    if(res.style.display==="none"){ calc(); }
+    const text = document.getElementById("interpretation").innerText;
+    navigator.clipboard.writeText("Результаты теста слушания\n"+text)
+      .then(()=>{ alert("Результаты скопированы в буфер обмена."); })
+      .catch(()=>{ alert("Не удалось скопировать. Разрешите доступ к буферу."); });
+  }
+
+  document.getElementById("calc").addEventListener("click", calc);
+  document.getElementById("reset").addEventListener("click", resetAll);
+  document.getElementById("copy").addEventListener("click", copyResults);
+</script>
+</body>
+</html>
